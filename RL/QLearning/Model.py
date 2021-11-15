@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import time
 
-np.random.seed(2) # reproducible
+#np.random.seed(2) # reproducible
 
 N_STATE = 6 # 状态
 ACTIONS = ["left", "right"] # 可选的行为
@@ -27,8 +27,40 @@ def init_table(n_state, actions):
     print(table)
     return table
 
-init_table(N_STATE, ACTIONS)
 
 
-def choose_action():
-    pass
+
+def choose_action(q_table, state):
+    """
+    根据当前state从q_table中选择action
+    :return:
+    """
+    state_actions = q_table.iloc[state,:]
+    if np.random.uniform()> EPSILON or (state_actions.all()==0): # 随机选取
+        action_name = np.random.choice(ACTIONS)
+    else:
+        action_name = state_actions.argmax()
+    return action_name
+
+q_table = init_table(N_STATE, ACTIONS)
+print(choose_action(q_table, 3))
+
+def get_env_feedback(S, A):
+    if A == "right":
+        if S == N_STATE-2:
+            S_ = "terminal"
+            R = 1
+        else:
+            S_ = S+1
+            R = 0
+    else:
+        R = 0
+        if S == 0:
+            S_ = S
+        else:
+            S_ = S-1
+    return S_, R
+
+def update_env(S, episode, step_counter):
+    env_list = []*(N_STATE-1) + ["T"]
+
