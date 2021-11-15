@@ -63,4 +63,14 @@ def get_env_feedback(S, A):
 
 def update_env(S, episode, step_counter):
     env_list = []*(N_STATE-1) + ["T"]
+    if S == "terminal":
+        interaction = f"episode {episode}: total_steps = {step_counter}"
+        print("\r{}".format(interaction), end="")
+        time.sleep(2)
+        print("\r                       ", end="")
+    else:
+        env_list[S]="o"
+        interaction = ''.join(env_list)
+        print("\r{}".format(interaction), end="")
+        time.sleep(FRESH_TIME)
 
