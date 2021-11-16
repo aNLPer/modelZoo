@@ -1,11 +1,14 @@
 """
-简单学习强化学习Q-Learning
+使用Q-Learning强化学习算法让agent寻找宝藏：
+该算法维护了一个状态-行为矩阵（Q-table），矩阵值表示该状态下执行对应行为的预期收益。
+agent每一步依据当前状态S，选择一个动作A，然后环境反馈奖励，并且更新agent所处的新环境S_
+agent在新的环境下选择新的A..........直到该episode结束。
 """
 import numpy as np
 import pandas as pd
 import time
 
-#np.random.seed(2) # reproducible
+np.random.seed(2) # reproducible
 
 N_STATE = 6 # 状态
 ACTIONS = ["left", "right"] # 可选的行为
@@ -18,18 +21,17 @@ FRESH_TIME = 0.1  # AGENT 决策时间间隔
 
 def init_table(n_state, actions):
     """
-    初始化q-table
+    初始化q-table为零矩阵
     :param n_state:
     :param actions:
     :return:
     """
     return pd.DataFrame(np.zeros((n_state, len(actions))), columns=actions)
 
-
-
 def choose_action(q_table, state):
     """
-    根据当前state从q_table中选择action
+    根据当前state从q_table中选择action，
+    0.9的概率选择预期收益最大的action，0.1的概率随机选择
     :return:
     """
     state_actions = q_table.iloc[state,:]
@@ -65,16 +67,18 @@ def update_env(S, episode, step_counter):
     env_list = ["-"]*(N_STATE-1) + ["T"]
     if S == "terminal":
         interaction = f"episode {episode}: total_steps = {step_counter}"
-        print("\r{}".format(interaction), end="")
+        #print("\r{}".format(interaction), end="")
+        print(f"\r{interaction}", end="")
         time.sleep(2)
-        print("\r                       ", end="")
+        print("\r   ", end="")
     else:
         env_list[S]="o"
         interaction = ''.join(env_list)
-        print("\r{}".format(interaction), end="")
+        print(f"\r{interaction}", end="")
         time.sleep(FRESH_TIME)
 
 def rl():
+
     q_table = init_table(N_STATE, ACTIONS)
     for episode in range(MAX_EPISODE):
         step_counter = 0
@@ -83,14 +87,16 @@ def rl():
         is_terminal = False
         update_env(S, episode, step_counter)
         while not is_terminal:
-            A = choose_action(q_table, S)  # 根据当前状态选择ACTION
-            S_, R = get_env_feedback(S, A)  # 根据ACTION和S（状态）获取奖励、更新状态
-            q_predict = q_table.loc[S,A]
+            A = choose_action(q_table, S)  # 根据当前状态S选择ACTION
+            q_predict = q_table.loc[S, A]  # 当前状态下的预期收益
+            S_, R = get_env_feedback(S, A)  # 根据ACTION和S（状态）计算奖励R、得到新的状态S_
             if S_ != "terminal":
+                # 计算新的状态下可以获得的最大收益
                 q_target = R + LAMDA * q_table.iloc[S_, :].max()
             else:
                 q_target = R
                 is_terminal = True
+            # 更新q_table[S,A]位置收益
             q_table.loc[S,A] += ALPHA * (q_target-q_predict)
             S = S_
 
