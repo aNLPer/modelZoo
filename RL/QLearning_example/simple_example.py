@@ -78,7 +78,6 @@ def update_env(S, episode, step_counter):
         time.sleep(FRESH_TIME)
 
 def rl():
-
     q_table = init_table(N_STATE, ACTIONS)
     for episode in range(MAX_EPISODE):
         step_counter = 0
