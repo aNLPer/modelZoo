@@ -11,7 +11,7 @@ import torch.utils.data as Data
 # S 表示 Start of sentence
 # P 表示 Padding and it Should be Zero
 sentences = [
-        # enc_input           dec_input         dec_output
+        # enc_input               dec_input            dec_output
         ['ich mochte ein bier P', 'S i want a beer .', 'i want a beer . E'],
         ['ich mochte ein cola P', 'S i want a coke .', 'i want a coke . E']
 ]
